@@ -5,5 +5,6 @@ from .fiber import (
     GHModes as GHModes,
     LargeCoreMMF as LargeCoreMMF,
 )
+from . import fiber as fiber
 from . import utils as utils
 from . import trarrays as trarrays
