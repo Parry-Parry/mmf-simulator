@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "simulator"
+version = "0.0.1"
+dependencies = [
+  "scipy"
+]
+requires-python = ">=3.7"
+authors = [
+  {name = "Andrew Parry", email = "0andrewparry@gmail.com"}
+]
+maintainers = [
+  {name = "Andrew Parry", email = "0andrewparry@gmail.com"}
+]
+description = ""
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["pytorch", "transformers", "ranking", "information retrieval"]
+classifiers = [
+    "Programming Language :: Python",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Repository = "https://github.com/Parry-Parry/mmf-simulator.git"
