@@ -11,6 +11,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
+    requires=['numpy', 'matplotlib', 'scipy'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
