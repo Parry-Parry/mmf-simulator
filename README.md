@@ -16,3 +16,6 @@ git pull
 ```
 pip install .
 ```
+```
+!pip install git+https://github.com/Parry-Parry/mmf-simulator.git
+```
