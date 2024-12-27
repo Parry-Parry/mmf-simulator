@@ -25,14 +25,17 @@ from math import factorial
 from scipy.special import gamma
 from scipy.linalg import expm
 
+
 class ModeFamily(object):
     """
     This is an abstract class that represents the modes of the
     fiber. This class is subclassed to obtain various mode patterns.
     """
+
     __metaclass__ = abc.ABCMeta
 
-    mode_attributes = ['theta', 'offset_x', 'offset_y']
+    mode_attributes = ["theta", "offset_x", "offset_y"]
+
     def __init__(self, w, XX, YY, **kwargs):
         """
         Defines the mode family for a fiber or waveguide. A summary of
@@ -50,7 +53,7 @@ class ModeFamily(object):
 
             # Method functions to return paramters
             exec("f = lambda self : self.%s" % i)
-            exec("f.__doc__ = \"Returns %s for this mode family\"" % (i))
+            exec('f.__doc__ = "Returns %s for this mode family"' % (i))
             exec("self.get_%s = types.MethodType(f, self)" % i)
         self.XX = XX
         self.YY = YY
@@ -63,6 +66,7 @@ class ModeFamily(object):
         initialized with.
         """
         raise NotImplemented
+
 
 class GHModes(ModeFamily):
     """
@@ -100,6 +104,7 @@ class GHModes(ModeFamily):
     >>> print("%.2f" % abs(utils.overlap(mode_pattern_1, mode_pattern_2)))
     0.00
     """
+
     def get_mode_pattern(self, p, q):
         """
         Return the Hermite-Gauss mode pattern for the mesh grid that
@@ -125,10 +130,16 @@ class GHModes(ModeFamily):
         R2 = numpy.square(XX) + numpy.square(YY)
 
         # Split the multiplication into steps
-        P1 = sqrt(2 / pi) / w / sqrt(pow(2.0, p + q) * float(factorial(p)) * float(factorial(q)))
+        P1 = (
+            sqrt(2 / pi)
+            / w
+            / sqrt(pow(2.0, p + q) * float(factorial(p)) * float(factorial(q)))
+        )
         P1 = 1.0
         P2 = P1 * Hp(sqrt(2.0) * (XX * cos(theta) + YY * sin(theta)) / w)
-        P3 = numpy.multiply(P2, Hq(sqrt(2.0) * (XX * -sin(theta) + YY * cos(theta)) / w))
+        P3 = numpy.multiply(
+            P2, Hq(sqrt(2.0) * (XX * -sin(theta) + YY * cos(theta)) / w)
+        )
         P4 = numpy.multiply(P3, exp(-R2 / w / w))
         P5 = P4 / sqrt(numpy.sum(numpy.square(P4)))
         return P5
@@ -147,11 +158,17 @@ class GHModes(ModeFamily):
 
         pattern = self.get_mode_pattern(p, q)
         pattern = pattern / numpy.max(pattern)
-        pyplot.imshow(numpy.abs(pattern.T), interpolation = 'bilinear', cmap = matplotlib.cm.nipy_spectral, origin='lower')
+        pyplot.imshow(
+            numpy.abs(pattern.T),
+            interpolation="bilinear",
+            cmap=matplotlib.cm.nipy_spectral,
+            origin="lower",
+        )
         pyplot.grid(True)
         pyplot.xticks([])
         pyplot.yticks([])
         pyplot.show()
+
 
 class Fiber(object):
     """
@@ -159,9 +176,10 @@ class Fiber(object):
     to be subclassed to implement a fiber model, based on various
     characteristics.
     """
+
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, length = 1000.0, step_length = 0.1, wavelength = 1.55e-6):
+    def __init__(self, length=1000.0, step_length=0.1, wavelength=1.55e-6):
         """
         Initialize the fiber with length and step size.
 
@@ -190,6 +208,7 @@ class Fiber(object):
     @abc.abstractmethod
     def populate_modes(self):
         raise NotImplemented
+
 
 class LargeCoreMMF(Fiber):
     """
@@ -252,23 +271,36 @@ class LargeCoreMMF(Fiber):
     >>> U = m.calculate_matrix(1.55e-6)
     """
 
-    fiber_attributes = ["NA", "wavelength", "a", "n0", "Csk0",
-        "delta", "DELTA", "sqrt", "w", "EXTENTS", "STEP", "sigma_kappa", "sigma_theta"]
+    fiber_attributes = [
+        "NA",
+        "wavelength",
+        "a",
+        "n0",
+        "Csk0",
+        "delta",
+        "DELTA",
+        "sqrt",
+        "w",
+        "EXTENTS",
+        "STEP",
+        "sigma_kappa",
+        "sigma_theta",
+    ]
 
     fiber_internals = ["admissible_modes", "betas"]
 
-    def __init__(self, length = 1000.0, step_length = 0.1, wavelength = 1.55e-6, **kwargs):
+    def __init__(self, length=1000.0, step_length=0.1, wavelength=1.55e-6, **kwargs):
         super(LargeCoreMMF, self).__init__(length, step_length, wavelength)
 
         # Default values
         self.NA = 0.19
-        self.wavelength = 1.55e-6;
-        self.a = 25e-6;
-        self.n0 = 1.444;
+        self.wavelength = 1.55e-6
+        self.a = 25e-6
+        self.n0 = 1.444
         self.Csk0 = 0.0878 * pow(self.n0, 3)
-        self.delta = 8000;
-        self.n_core = self.n0;
-        self.DELTA = 0.5 * pow((self.NA / self.n0), 2);
+        self.delta = 8000
+        self.n_core = self.n0
+        self.DELTA = 0.5 * pow((self.NA / self.n0), 2)
         self.sigma_kappa = 1.0
         self.sigma_theta = 1.0
         self.sigma_kappa = sqrt(0.36)
@@ -285,7 +317,7 @@ class LargeCoreMMF(Fiber):
 
             # Method functions to return paramters
             exec("f = lambda self : self.%s" % i)
-            exec("f.__doc__ = \"Returns %s for this fiber\"" % (i))
+            exec('f.__doc__ = "Returns %s for this fiber"' % (i))
             exec("self.get_%s = types.MethodType(f, self)" % i)
 
         for i in self.fiber_internals:
@@ -293,10 +325,10 @@ class LargeCoreMMF(Fiber):
 
             # Method functions to return paramters
             exec("f = lambda self : self.%s" % i)
-            exec("f.__doc__ = \"Returns %s for this fiber\"" % (i))
+            exec('f.__doc__ = "Returns %s for this fiber"' % (i))
             exec("self.get_%s = types.MethodType(f, self)" % i)
 
-        self.w = sqrt(sqrt(2) * self.a / (self.k0 * self.n0 * sqrt(self.DELTA)));
+        self.w = sqrt(sqrt(2) * self.a / (self.k0 * self.n0 * sqrt(self.DELTA)))
         self.populate_modes()
 
     def calculate_beta(self, p, q):
@@ -304,14 +336,36 @@ class LargeCoreMMF(Fiber):
         Calculates the beta values as a function of the wavelength.
         """
         # Refractive index components
-        n0x = lambda kappa : (self.delta * self.Csk0 * pow(self.a * kappa, 2) / 2.0 + 2.0 * self.n0) / 2.0
-        n0xy = lambda kappa : (n0x(kappa), 2 * self.n0 - n0x(kappa));
+        n0x = (
+            lambda kappa: (
+                self.delta * self.Csk0 * pow(self.a * kappa, 2) / 2.0 + 2.0 * self.n0
+            )
+            / 2.0
+        )
+        n0xy = lambda kappa: (n0x(kappa), 2 * self.n0 - n0x(kappa))
 
         alpha = 2.0
         V = lambda L: 2 * numpy.pi / L * self.a * self.n0 * sqrt(2.0 * self.DELTA)
-        b_tilde = lambda L : pow(gamma(1.0 / alpha + 0.5) * (alpha + 2.0) * (p + q + 1) * sqrt(numpy.pi) * pow(V(L), 2.0 / alpha), alpha / (2.0 + alpha))
-        return (lambda L, kappa : 1.0 / self.a * sqrt(pow(2 * numpy.pi / L * self.a * n0xy(kappa)[0], 2) - pow(b_tilde(L), 2)),
-                lambda L, kappa : 1.0 / self.a * sqrt(pow(2 * numpy.pi / L * self.a * n0xy(kappa)[1], 2) - pow(b_tilde(L), 2)))
+        b_tilde = lambda L: pow(
+            gamma(1.0 / alpha + 0.5)
+            * (alpha + 2.0)
+            * (p + q + 1)
+            * sqrt(numpy.pi)
+            * pow(V(L), 2.0 / alpha),
+            alpha / (2.0 + alpha),
+        )
+        return (
+            lambda L, kappa: 1.0
+            / self.a
+            * sqrt(
+                pow(2 * numpy.pi / L * self.a * n0xy(kappa)[0], 2) - pow(b_tilde(L), 2)
+            ),
+            lambda L, kappa: 1.0
+            / self.a
+            * sqrt(
+                pow(2 * numpy.pi / L * self.a * n0xy(kappa)[1], 2) - pow(b_tilde(L), 2)
+            ),
+        )
 
     def set_beta_values(self):
         """
@@ -334,27 +388,59 @@ class LargeCoreMMF(Fiber):
                 pp, qp = admissible_modes[n]
 
                 if ((pp + 1 == p) or (pp - 1 == p)) and (q == qp):
-                    index_1, index_2 = admissible_modes.index([p, q]), admissible_modes.index([pp, qp])
-                    C[index_1, index_2] = 2 * numpy.pi / L * self.n0 * kappa * self.w / 2.0 * \
-                    (float(p == (pp + 1)) * sqrt(p) + (p == (pp - 1)) * sqrt(pp))
+                    index_1, index_2 = admissible_modes.index(
+                        [p, q]
+                    ), admissible_modes.index([pp, qp])
+                    C[index_1, index_2] = (
+                        2
+                        * numpy.pi
+                        / L
+                        * self.n0
+                        * kappa
+                        * self.w
+                        / 2.0
+                        * (float(p == (pp + 1)) * sqrt(p) + (p == (pp - 1)) * sqrt(pp))
+                    )
         return C
 
     def uiprop(self, gamma_x, gamma_y, C, delta_per_section, M):
         uiprop_matrix = (1 + 0.0j) * numpy.zeros((2 * M, 2 * M))
         Mx = (-gamma_x + 1.0j * C) * delta_per_section
-        uiprop_matrix[:M,:M] = expm(Mx)
+        uiprop_matrix[:M, :M] = expm(Mx)
         My = (-gamma_y + 1.0j * C) * delta_per_section
-        uiprop_matrix[M:,M:] = expm(My)
+        uiprop_matrix[M:, M:] = expm(My)
         return uiprop_matrix
 
     def _sum_psi_matrix(self, p, q, m, n, k, l, ct, st, outer_factor):
-        part_sum = 0;
-        s2 = k + q - l + m;
-        t2 = p - k + l + n;
+        part_sum = 0
+        s2 = k + q - l + m
+        t2 = p - k + l + n
         s = s2 / 2
         t = t2 / 2
-        if s % 2 == 0 and t % 2 == 0 and (s >= k) and (s >= q - l) and (s >= m) and (t >= p - k) and (t >= l) and (t >= n):
-            part_sum = outer_factor * pow(-1, p - k) * pow(ct, k+l) * pow(st, p - k + q - l) / (factorial(s - k) * factorial(s - q + l) * factorial(s - m) * factorial(t - p + k) * factorial(t - l) * factorial(t - n))
+        if (
+            s % 2 == 0
+            and t % 2 == 0
+            and (s >= k)
+            and (s >= q - l)
+            and (s >= m)
+            and (t >= p - k)
+            and (t >= l)
+            and (t >= n)
+        ):
+            part_sum = (
+                outer_factor
+                * pow(-1, p - k)
+                * pow(ct, k + l)
+                * pow(st, p - k + q - l)
+                / (
+                    factorial(s - k)
+                    * factorial(s - q + l)
+                    * factorial(s - m)
+                    * factorial(t - p + k)
+                    * factorial(t - l)
+                    * factorial(t - n)
+                )
+            )
         return part_sum
 
     def initialize_projection_parameters(self):
@@ -369,16 +455,38 @@ class LargeCoreMMF(Fiber):
             m, n = admissible_modes[i]
             for j in range(M):
                 p, q = admissible_modes[j]
-                outer_factor = sqrt(1.0 * factorial(p) * factorial(q) * factorial(m) * factorial(n))
+                outer_factor = sqrt(
+                    1.0 * factorial(p) * factorial(q) * factorial(m) * factorial(n)
+                )
                 for k in range(p + 1):
                     for l in range(q + 1):
-                        s2 = k + q - l + m;
-                        t2 = p - k + l + n;
+                        s2 = k + q - l + m
+                        t2 = p - k + l + n
                         s = s2 / 2
                         t = t2 / 2
                         kl_index = alist.index([k, l])
-                        if s2 % 2 == 0 and t2 % 2 == 0 and (s >= k) and (s >= q - l) and (s >= m) and (t >= p - k) and (t >= l) and (t >= n):
-                            p_matrix[i, j, kl_index] = outer_factor * pow(-1, p - k) / (factorial(s - k) * factorial(s - q + l) * factorial(s - m) * factorial(t - p + k) * factorial(t - l) * factorial(t - n))
+                        if (
+                            s2 % 2 == 0
+                            and t2 % 2 == 0
+                            and (s >= k)
+                            and (s >= q - l)
+                            and (s >= m)
+                            and (t >= p - k)
+                            and (t >= l)
+                            and (t >= n)
+                        ):
+                            p_matrix[i, j, kl_index] = (
+                                outer_factor
+                                * pow(-1, p - k)
+                                / (
+                                    factorial(s - k)
+                                    * factorial(s - q + l)
+                                    * factorial(s - m)
+                                    * factorial(t - p + k)
+                                    * factorial(t - l)
+                                    * factorial(t - n)
+                                )
+                            )
                             powsin_matrix[i, j, kl_index] = p - k + q - l
                             powcos_matrix[i, j, kl_index] = k + l
         self.p_matrix = p_matrix
@@ -395,7 +503,12 @@ class LargeCoreMMF(Fiber):
         powcos_matrix = self.powcos_matrix
         powsin_matrix = self.powsin_matrix
         sin, cos = numpy.sin, numpy.cos
-        psi_matrix = numpy.sum(p_matrix * numpy.power(cos(theta), powcos_matrix) * numpy.power(sin(theta), powsin_matrix), axis=2)
+        psi_matrix = numpy.sum(
+            p_matrix
+            * numpy.power(cos(theta), powcos_matrix)
+            * numpy.power(sin(theta), powsin_matrix),
+            axis=2,
+        )
 
         psi_matrix = numpy.kron(numpy.eye(2), psi_matrix)
         return psi_matrix
@@ -406,10 +519,12 @@ class LargeCoreMMF(Fiber):
         """
         sin, cos = numpy.sin, numpy.cos
         M = len(self.admissible_modes)
-        return numpy.kron(numpy.array([[cos(theta), sin(theta)], [-sin(theta), cos(theta)]]), \
-                          numpy.eye(M))
+        return numpy.kron(
+            numpy.array([[cos(theta), sin(theta)], [-sin(theta), cos(theta)]]),
+            numpy.eye(M),
+        )
 
-    def calculate_matrix(self, L=None, kappa_vals = None, theta_vals = None):
+    def calculate_matrix(self, L=None, kappa_vals=None, theta_vals=None):
         """
         Evaluates the total mode transformation matrix for a
         particular wavelength.
@@ -418,7 +533,7 @@ class LargeCoreMMF(Fiber):
             L = self.wavelength
         n_sections = int(self.length / self.step_length)
         M = len(self.admissible_modes)
-        U = numpy.eye(2*M, 2*M)
+        U = numpy.eye(2 * M, 2 * M)
         if kappa_vals == None:
             kappa_vals = numpy.abs(self.sigma_kappa * numpy.random.randn(n_sections))
         if theta_vals == None:
@@ -459,7 +574,7 @@ class LargeCoreMMF(Fiber):
         w = self.w
         MAX = int(numpy.floor((a / w) * (a / w)))
         self.MAX = MAX
-        #self.admissible_modes = numpy.concatenate([[(i, j) for i in range(j + 1)] for j in range(MAX + 1)])
+        # self.admissible_modes = numpy.concatenate([[(i, j) for i in range(j + 1)] for j in range(MAX + 1)])
         self.admissible_modes = []
         for p in range(MAX + 1):
             for q in range(MAX + 1):
@@ -468,7 +583,7 @@ class LargeCoreMMF(Fiber):
         self.admissible_modes = numpy.array(self.admissible_modes)
         admissible_modes = self.admissible_modes
         M = len(admissible_modes)
-        self.betas = [None] * (2*M)
+        self.betas = [None] * (2 * M)
         self.set_beta_values()
 
         # Now define the spatial properties
@@ -487,7 +602,9 @@ class LargeCoreMMF(Fiber):
         self.receive_matrix = r_array.overlap_matrix(self)
         self.receiver_connected = True
 
+
 if __name__ == "__main__":
     import doctest
     import utils
+
     doctest.testmod(raise_on_error=True)

@@ -28,6 +28,7 @@ simulation phases. For example:
 
 import numpy
 
+
 def hermite_poly(n):
     """
     Returns the n-th degree physicists' Hermite polynomial.
@@ -48,6 +49,7 @@ def hermite_poly(n):
     coeff_polynomial.extend([1])
     return numpy.polynomial.hermite.herm2poly(coeff_polynomial)
 
+
 def overlap(Er1, Er2):
     """
     This method performs an overlap of the two matrices ``Er1`` and
@@ -56,15 +58,16 @@ def overlap(Er1, Er2):
     multiplication.
     """
     if Er1.shape != Er2.shape:
-        raise ValueError('Matrix shapes do not match for overlap!')
+        raise ValueError("Matrix shapes do not match for overlap!")
 
     # First find the normalization for the matrices
-    E1_mag = numpy.linalg.norm(Er1, ord='fro')
-    E2_mag = numpy.linalg.norm(Er2, ord='fro')
+    E1_mag = numpy.linalg.norm(Er1, ord="fro")
+    E2_mag = numpy.linalg.norm(Er2, ord="fro")
 
     return numpy.sum(numpy.multiply(Er1, Er2.conj())) / E1_mag / E2_mag
 
-def bandwidth_to_wavelength_range(maxf, L, steps = 10):
+
+def bandwidth_to_wavelength_range(maxf, L, steps=10):
     """
     This method converts a given bandwidth range to a wavelength range
     for use with the simulator.
@@ -81,4 +84,5 @@ def bandwidth_to_wavelength_range(maxf, L, steps = 10):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod(raise_on_error=True)
